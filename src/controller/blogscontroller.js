@@ -1,37 +1,80 @@
 const blogsModule = require("../modules/blogsModule")
+const authorModule = require('../modules/authorModule')
 
-// const getAllBlogs = async function (req, res) {
-//     try {
-//         let { _id, category, tag, subcategory } = req.query
-//         let query = {}
-//         if (_id != null) query._id = _id
-//         if (category != null) query.category = category
-//         if (tag != null) query.tag = tag
-//         if (subcategory != null) query.subcategory = subcategory
-//         let result = await blogsModule.find({ isDeleted: false, isPublished: true, query })
-//         if (result) {
-//             res.status(200).send({ status: true, data: result })
-//         } else {
-//             res.status(404).send({ status: false, msg: "" })
-//         }
-//     }
-//     catch (error) {
-//         res.send({ status: false, msg: error.message })
-//     }
-// }
+
+const createBlogs = async (req, res) => {
+    try {
+
+        // 👇 get all data from body here 🤯
+        const data = req.body;
+
+        // validate required info...
+        if (Object.keys(data).length <= 0) {
+            return res.status(400).send({
+                status: false,
+                msg: "POST Body data required"
+            })
+        }
+
+
+        // 👇 need to check author id is valid or not 🔍🔍
+        const isValidAuthor = await authorModule.findById(data.authorId)
+            .catch(err => null);
+        if (!isValidAuthor) { // NOT true
+            return res.status(401).send({
+                status: false,
+                msg: "⚠️ Invalid AuthorId, please try with a valid AuthorId"
+            })
+        }
+
+        // 👇 Create a blog document from request body
+        const createBlogs = await blogsModule.create(data)
+
+        res.status(201).send({
+            status: true,
+            data: createBlogs
+        })
+    } catch (err) {
+        res.status(500).send({
+            status: true,
+            msg: err.message
+        })
+    }
+}
+
+
+
 
 const deleteBlogsById = async function (req, res) {
     try {
         let blogId = req.params.blogId
-        let result = await blogsModule.findOne({ _id: blogId, isDeleted: false })
+        let result = await blogsModule.findOne({
+            _id: blogId,
+            isDeleted: false
+        })
         if (result) {
-            let updated = await blogsModule.findByIdAndUpdate({ _id: blogId }, { isDeleted: true }, { new: true })
-            res.status(200).send({ status: true, msg:"Deletion Successfull" })
+            let updated = await blogsModule.findByIdAndUpdate({
+                _id: blogId
+            }, {
+                isDeleted: true
+            }, {
+                new: true
+            })
+            res.status(200).send({
+                status: true,
+                msg: "Deletion Successfull"
+            })
         } else {
-            res.status(404).send({ status: false, msg: "Not Found" })
+            res.status(404).send({
+                status: false,
+                msg: "Not Found"
+            })
         }
     } catch (error) {
-        res.status(500).send({ status: false, msg: error.message })
+        res.status(500).send({
+            status: false,
+            msg: error.message
+        })
     }
 }
 
@@ -41,4 +84,5 @@ const deleteBlogsById = async function (req, res) {
 
 
 //module.exports.getAllBlogs = getAllBlogs
+module.exports.createBlogs = createBlogs
 module.exports.deleteBlogsById = deleteBlogsById
