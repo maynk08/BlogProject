@@ -1,28 +1,43 @@
 const express = require('express');
-const { route } = require('express/lib/application');
+const {
+    route
+} = require('express/lib/application');
 const router = express.Router();
 
 const authorController = require("../controller/authorControllers")
 const blogscontroller = require("../controller/blogscontroller")
 
 
+// create author
+router.post("/createAuthors", authorController.createAuthor)
+
+// create blogs
 router.post("/blogs", blogscontroller.createBlogs)
 
-router.post("/createAuthors",authorController.createAuthor)
+// get all blogs by query
+router.get("/blogs", blogscontroller.getAllBlogs)
 
+// update blogs by query
 router.put("/blogs/:blogId", blogscontroller.updateBlogsById)
 
+// delete by id
 router.delete("/blogs/:blogId", blogscontroller.deleteBlogsById)
 
-router.delete("/blogs",blogscontroller.deleteBlogsByQuery)
+// delete by query
+router.delete("/blogs", blogscontroller.deleteBlogsByQuery)
 
 
 
 
 
 
-
-router.all("/**",function(req,res){res.status(404).send({status:false,msg:"The api you request is not available"})})
+// if api is invalid
+router.all("/**", function (req, res) {
+    res.status(404).send({
+        status: false,
+        msg: "The api you request is not available"
+    })
+})
 
 
 module.exports = router;
