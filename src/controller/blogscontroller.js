@@ -82,21 +82,60 @@ const deleteBlogsById = async function (req, res) {
 const deleteBlogsByQuery = async function (req, res) {
     try {
         let data = req.query
-        if (Object.keys(data).length==0) {
-        res.status(400).send({status:false,msg:"no query params available " })
+        if (Object.keys(data).length == 0) {
+            res.status(400).send({ status: false, msg: "no query params available " })
         }
-        data.isDeleted=false
-        const available=await blogsModule.find(data).count()
-        if (available==0){
-            res.status(404).send({status:false,msg:"query data not found " })  
+        data.isDeleted = false
+        const available = await blogsModule.find(data).count()
+        if (available == 0) {
+            res.status(404).send({ status: false, msg: "query data not found " })
         }
         const deleteData = await blogsModule.updateMany(data, { $set: { isDeleted: true } })
         res.status(200).send({ status: true, msg: deleteData })
     } catch (error) {
-        res.status(500).send({status: false, msg: error.message  })
+        res.status(500).send({ status: false, msg: error.message })
 
     }
 
+}
+
+
+const updateBlogsById = async function (req, res) {
+    try {
+        let blogId = req.params.blogId
+        let data = req.body
+        if (Object.keys(data).length == 0) return res.status(400).send({ status: false, msg: "Body is required" })
+        let blogData = await blogsModule.findOne({ _id: blogId })
+        if (blogData) {
+            if (data.title) blogData.title = data.title
+            if (data.body) blogData.body = data.body
+            if (data.category) blogData.category = data.category
+            if (data.tags) {
+                if (typeof data.tags == 'object') {
+                    blogData.tags.push(...data.tags)
+                } else {
+                    return res.status(400).send({ status: false, msg: "tag value must be an array" })
+                }
+
+            }
+            if (data.subcategory) {
+                if (typeof data.subcategory == 'object') {
+                    blogData.subcategory.push(...data.subcategory)
+                } else {
+                    return res.status(400).send({ status: false, msg: "subcategory value must be an array" })
+                }
+
+            }
+            blogData.publishedAt = Date.now()
+            blogData.isPublished = true
+            blogData.save()
+        }
+
+        res.status(200).send({ status: true, data: blogData })
+    }
+    catch (error) {
+        res.status(500).send({ status: false, msg: error.message })
+    }
 }
 
 
@@ -104,9 +143,7 @@ const deleteBlogsByQuery = async function (req, res) {
 
 
 
-
-
-
 module.exports.createBlogs = createBlogs
+module.exports.updateBlogsById = updateBlogsById
 module.exports.deleteBlogsById = deleteBlogsById
 module.exports.deleteBlogsByQuery = deleteBlogsByQuery
