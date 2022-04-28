@@ -1,6 +1,18 @@
 const blogsModule = require("../modules/blogsModule");
 const authorModule = require("../modules/authorModule");
 
+
+
+
+
+
+
+
+
+/*------------------------------------------------------------------------------------------
+➡️ POST METHOD, CREATE NEW BLOG USING
+------------------------------------------------------------------------------------------ */
+
 const createBlogs = async (req, res) => {
     try {
         // 👇 get all data from body here 🤯
@@ -35,11 +47,19 @@ const createBlogs = async (req, res) => {
         });
     } catch (err) {
         res.status(500).send({
-            status: true,
+            status: false,
             msg: err.message
         });
     }
 };
+
+
+
+
+
+/*------------------------------------------------------------------------------------------
+ ➡️ GET METHOD, GET ALL LIST OF BLOGS
+------------------------------------------------------------------------------------------ */
 
 const getAllBlogs = async (req, res) => {
     try {
@@ -98,6 +118,83 @@ const getAllBlogs = async (req, res) => {
     }
 };
 
+
+
+
+
+/*------------------------------------------------------------------------------------------
+ ➡️ PUT METHOD, UPDATE BY BLOG-ID AS PARAMS
+------------------------------------------------------------------------------------------ */
+
+const updateBlogsById = async function (req, res) {
+    try {
+        let blogId = req.params.blogId;
+        let data = req.body;
+        if (Object.keys(data).length == 0)
+            return res.status(400).send({
+                status: false,
+                msg: "Body is required"
+            });
+        let blogData = await blogsModule.findOne({
+            _id: blogId,
+            isDeleted: false
+        });
+
+
+        if (!blogData) return res.status(404).send({
+            status: false,
+            msg: "blogs-Id related data unavailable"
+        })
+
+        if (data.title) blogData.title = data.title;
+        if (data.body) blogData.body = data.body;
+        if (data.category) blogData.category = data.category;
+        if (data.tags) {
+            if (typeof data.tags == "object") {
+                blogData.tags.push(...data.tags);
+            } else {
+                return res.status(400).send({
+                    status: false,
+                    msg: "tag value must be an array"
+                });
+            }
+        }
+        if (data.subcategory) {
+            if (typeof data.subcategory == "object") {
+                blogData.subcategory.push(...data.subcategory);
+            } else {
+                return res.status(400).send({
+                    status: false,
+                    msg: "subcategory value must be an array"
+                });
+            }
+        }
+        blogData.publishedAt = Date();
+        blogData.isPublished = true;
+        blogData.save();
+
+        res.status(200).send({
+            status: true,
+            data: blogData
+        });
+    } catch (error) {
+        res.status(500).send({
+            status: false,
+            msg: error.message
+        });
+    }
+};
+
+
+
+
+
+
+
+/*------------------------------------------------------------------------------------------
+ ➡️ DELETE METHOD, DELETE BY BLOG-ID AS PARAMS
+------------------------------------------------------------------------------------------ */
+
 const deleteBlogsById = async function (req, res) {
     try {
         let blogId = req.params.blogId;
@@ -131,58 +228,13 @@ const deleteBlogsById = async function (req, res) {
     }
 };
 
-const updateBlogsById = async function (req, res) {
-    try {
-        let blogId = req.params.blogId;
-        let data = req.body;
-        if (Object.keys(data).length == 0)
-            return res.status(400).send({
-                status: false,
-                msg: "Body is required"
-            });
-        let blogData = await blogsModule.findOne({
-            _id: blogId
-        });
-        if (blogData) {
-            if (data.title) blogData.title = data.title;
-            if (data.body) blogData.body = data.body;
-            if (data.category) blogData.category = data.category;
-            if (data.tags) {
-                if (typeof data.tags == "object") {
-                    blogData.tags.push(...data.tags);
-                } else {
-                    return res.status(400).send({
-                        status: false,
-                        msg: "tag value must be an array"
-                    });
-                }
-            }
-            if (data.subcategory) {
-                if (typeof data.subcategory == "object") {
-                    blogData.subcategory.push(...data.subcategory);
-                } else {
-                    return res.status(400).send({
-                        status: false,
-                        msg: "subcategory value must be an array"
-                    });
-                }
-            }
-            blogData.publishedAt = Date.now();
-            blogData.isPublished = true;
-            blogData.save();
-        }
 
-        res.status(200).send({
-            status: true,
-            data: blogData
-        });
-    } catch (error) {
-        res.status(500).send({
-            status: false,
-            msg: error.message
-        });
-    }
-};
+
+
+
+/*------------------------------------------------------------------------------------------
+ ➡️ DELETE METHOD, DELETE BY QUERY
+------------------------------------------------------------------------------------------ */
 
 const deleteBlogsByQuery = async function (req, res) {
     try {
@@ -257,6 +309,20 @@ const deleteBlogsByQuery = async function (req, res) {
         });
     }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports.createBlogs = createBlogs;
 module.exports.getAllBlogs = getAllBlogs
