@@ -1,30 +1,31 @@
 const express = require('express');
-const {
-    route
-} = require('express/lib/application');
+//const {route} = require('express/lib/application');
 const router = express.Router();
 
 const authorController = require("../controller/authorControllers")
-const blogscontroller = require("../controller/blogscontroller")
+const blogsController = require("../controller/blogsController")
 
 
 // create author
 router.post("/createAuthors", authorController.createAuthor)
 
+//create post login with jwt token as output
+router.post("/login",authorController.authorLogin)
+
 // create blogs
-router.post("/blogs", blogscontroller.createBlogs)
+router.post("/blogs", blogsController.createBlogs)
 
 // get all blogs by query
-router.get("/blogs", blogscontroller.getAllBlogs)
+router.get("/blogs", blogsController.getAllBlogs)
 
 // update blogs by query
-router.put("/blogs/:blogId", blogscontroller.updateBlogsById)
+router.put("/blogs/:blogId", blogsController.updateBlogsById)
 
 // delete by id
-router.delete("/blogs/:blogId", blogscontroller.deleteBlogsById)
+router.delete("/blogs/:blogId", blogsController.deleteBlogsById)
 
 // delete by query
-router.delete("/blogs", blogscontroller.deleteBlogsByQuery)
+router.delete("/blogs", blogsController.deleteBlogsByQuery)
 
 
 
