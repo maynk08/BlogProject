@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 const authorController = require("../controller/authorControllers")
-const blogsController = require("../controller/blogsController")
-const auth = require("../middleware/authorization")
+const blogsController = require("../controller/blogsController");
+const {authentication,authorization} = require('../middleware/authorization');
 
 // create author
 router.post("/createAuthors", authorController.createAuthor)
@@ -13,19 +13,19 @@ router.post("/createAuthors", authorController.createAuthor)
 router.post("/login", authorController.authorLogin)
 
 // create blogs
-router.post("/blogs", auth, blogsController.createBlogs)
+router.post("/blogs", authentication, blogsController.createBlogs)
 
 // get all blogs by query
-router.get("/blogs", auth, blogsController.getAllBlogs)
+router.get("/blogs", authentication,  blogsController.getAllBlogs)
 
 // update blogs by query
-router.put("/blogs/:blogId", auth, blogsController.updateBlogsById)
+router.put("/blogs/:blogId", authentication, authorization, blogsController.updateBlogsById)
 
 // delete by id
-router.delete("/blogs/:blogId", auth, blogsController.deleteBlogsById)
+router.delete("/blogs/:blogId", authentication, authorization, blogsController.deleteBlogsById)
 
 // delete by query
-router.delete("/blogs", auth, blogsController.deleteBlogsByQuery)
+router.delete("/blogs", authentication, blogsController.deleteBlogsByQuery)
 
 
 

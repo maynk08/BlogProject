@@ -217,7 +217,7 @@ const deleteBlogsById = async function (req, res) {
         } else {
             res.status(404).send({
                 status: false,
-                msg: "Not Found"
+                msg: "User data not found"
             });
         }
     } catch (error) {
@@ -299,7 +299,7 @@ const deleteBlogsByQuery = async function (req, res) {
         });
         res.status(200).send({
             status: true,
-            msg: deleteData
+            data: deleteData
         });
 
     } catch (error) {
