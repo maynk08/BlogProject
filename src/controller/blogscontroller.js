@@ -19,13 +19,13 @@ const createBlogs = async (req, res) => {
         const data = req.body;
 
         // validate required info...
-        if (Object.keys(data).length <= 0) {
+        if (Object.keys(data).length == 0) {
             return res.status(400).send({
                 status: false,
                 msg: "POST Body data required"
             });
         }
-
+        if (!data.authorId) return res.status(400).send({ status: false, msg: "authorId id mandatory" })
         // 👇 need to check author id is valid or not 🔍🔍
         const isValidAuthor = await authorModule
             .findById(data.authorId)
@@ -82,18 +82,19 @@ const getAllBlogs = async (req, res) => {
                 };
             }
 
-            query["$or"] = [{
-                    authorId: data.authorId
-                },
-                {
-                    tags: data.tags
-                },
-                {
-                    category: data.category
-                },
-                {
-                    subcategory: data.subcategory
-                }
+            query["$or"] = [{ title: data.title },
+            {
+                authorId: data.authorId
+            },
+            {
+                tags: data.tags
+            },
+            {
+                category: data.category
+            },
+            {
+                subcategory: data.subcategory
+            }
             ];
         }
 
@@ -108,7 +109,7 @@ const getAllBlogs = async (req, res) => {
 
         res.status(200).send({
             status: true,
-            msg: allBlogs
+            data: allBlogs
         });
     } catch (err) {
         res.status(500).send({
@@ -169,7 +170,7 @@ const updateBlogsById = async function (req, res) {
                 });
             }
         }
-        blogData.publishedAt = Date();
+        blogData.publishedAt = Date();//Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
         blogData.isPublished = true;
         blogData.save();
 
@@ -202,24 +203,18 @@ const deleteBlogsById = async function (req, res) {
             _id: blogId,
             isDeleted: false
         });
-        if (result) {
-            let updated = await blogsModule.findByIdAndUpdate({
-                _id: blogId
-            }, {
-                isDeleted: true
-            }, {
-                new: true
-            });
-            res.status(200).send({
-                status: true,
-                msg: "Deletion Successfull"
-            });
-        } else {
-            res.status(404).send({
-                status: false,
-                msg: "User data not found"
-            });
-        }
+        if (!result) return res.status(404).send({ status: false, msg: "User data not found" })
+        let updated = await blogsModule.findByIdAndUpdate({
+            _id: blogId
+        }, {
+            isDeleted: true
+        }, {
+            new: true
+        });
+        res.status(200).send({
+            status: true,
+            data: "Deletion Successfull"
+        });
     } catch (error) {
         res.status(500).send({
             status: false,
@@ -241,7 +236,8 @@ const deleteBlogsByQuery = async function (req, res) {
         let data = req.query;
         // add a query variable and add a default key value [ isDeleted: false ]
         let query = {
-            isDeleted: false
+            isDeleted: false,
+            authorId: req.decodedToken.authorId
         };
 
         if (Object.keys(data).length == 0) {
@@ -266,18 +262,16 @@ const deleteBlogsByQuery = async function (req, res) {
             }
 
             // create a query structure in [ query.$or = ... }
-            query["$or"] = [{
-                    authorId: data.authorId
-                },
-                {
-                    tags: data.tags
-                },
-                {
-                    category: data.category
-                },
-                {
-                    subcategory: data.subcategory
-                }
+            query["$or"] = [{ title: data.title },
+            {
+                tags: data.tags
+            },
+            {
+                category: data.category
+            },
+            {
+                subcategory: data.subcategory
+            }
             ];
         }
 

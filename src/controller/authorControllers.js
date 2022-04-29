@@ -16,6 +16,7 @@ const createAuthor = async function (req, res) {
             return res.status(400).send({ status: false, msg: "Body is required" })
         }
         const saveData = await authorModule.create(reqAuthor)
+        if(!saveData) return res.status(500).send({status:false,msg:"Can't save something went wrong"})
         res.status(201).send({ status: true, data: saveData })
 
     }
@@ -42,7 +43,7 @@ const authorLogin = async function (req, res) {
         if (!findAuthor) return res.status(401).send({ status: false, msg: "email & password not valid" })
 
         //jwt.sign token creation
-        const token = jwt.sign({ authorId: findAuthor._id }, 'Group 27');
+        const token = jwt.sign({ authorId: findAuthor._id.toString() }, 'Group 27');
         res.status(200).send({status:true,data:token})
     }
     catch (err) {
