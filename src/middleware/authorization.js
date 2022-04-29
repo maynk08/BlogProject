@@ -21,7 +21,7 @@ const authentication = (req, res, next) => {
 const authorization = async (req, res, next) => {
     try {
         let author_Id = req.decodedToken.authorId
-        console.log(author_Id)
+        //console.log(author_Id)
         let blogId = req.params.blogId
         let author = await blogsModule.findOne({ authorId: author_Id, _id: blogId })
         if (!author) return res.status(403).send({ status: false, msg: "Unauthorized User" })

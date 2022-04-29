@@ -17,6 +17,7 @@ const createBlogs = async (req, res) => {
     try {
         // 👇 get all data from body here 🤯
         const data = req.body;
+        data.authorId = req.decodedToken.authorId
 
         // validate required info...
         if (Object.keys(data).length == 0) {
@@ -25,7 +26,10 @@ const createBlogs = async (req, res) => {
                 msg: "POST Body data required"
             });
         }
-        if (!data.authorId) return res.status(400).send({ status: false, msg: "authorId id mandatory" })
+        if (!data.authorId) return res.status(400).send({
+            status: false,
+            msg: "authorId id mandatory"
+        })
         // 👇 need to check author id is valid or not 🔍🔍
         const isValidAuthor = await authorModule
             .findById(data.authorId)
@@ -82,19 +86,21 @@ const getAllBlogs = async (req, res) => {
                 };
             }
 
-            query["$or"] = [{ title: data.title },
-            {
-                authorId: data.authorId
-            },
-            {
-                tags: data.tags
-            },
-            {
-                category: data.category
-            },
-            {
-                subcategory: data.subcategory
-            }
+            query["$or"] = [{
+                    title: data.title
+                },
+                {
+                    authorId: data.authorId
+                },
+                {
+                    tags: data.tags
+                },
+                {
+                    category: data.category
+                },
+                {
+                    subcategory: data.subcategory
+                }
             ];
         }
 
@@ -170,7 +176,7 @@ const updateBlogsById = async function (req, res) {
                 });
             }
         }
-        blogData.publishedAt = Date();//Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
+        blogData.publishedAt = Date(); //Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
         blogData.isPublished = true;
         blogData.save();
 
@@ -203,7 +209,10 @@ const deleteBlogsById = async function (req, res) {
             _id: blogId,
             isDeleted: false
         });
-        if (!result) return res.status(404).send({ status: false, msg: "User data not found" })
+        if (!result) return res.status(404).send({
+            status: false,
+            msg: "User data not found"
+        })
         let updated = await blogsModule.findByIdAndUpdate({
             _id: blogId
         }, {
@@ -262,16 +271,18 @@ const deleteBlogsByQuery = async function (req, res) {
             }
 
             // create a query structure in [ query.$or = ... }
-            query["$or"] = [{ title: data.title },
-            {
-                tags: data.tags
-            },
-            {
-                category: data.category
-            },
-            {
-                subcategory: data.subcategory
-            }
+            query["$or"] = [{
+                    title: data.title
+                },
+                {
+                    tags: data.tags
+                },
+                {
+                    category: data.category
+                },
+                {
+                    subcategory: data.subcategory
+                }
             ];
         }
 
