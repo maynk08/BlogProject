@@ -216,7 +216,8 @@ const deleteBlogsById = async function (req, res) {
         let updated = await blogsModule.findByIdAndUpdate({
             _id: blogId
         }, {
-            isDeleted: true
+            isDeleted: true,
+            deletedAt: Date()
         }, {
             new: true
         });
@@ -299,7 +300,8 @@ const deleteBlogsByQuery = async function (req, res) {
         // perform delete here using update many 
         const deleteData = await blogsModule.updateMany(query, {
             $set: {
-                isDeleted: true
+                isDeleted: true,
+                deletedAt: Date()
             }
         });
         res.status(200).send({
