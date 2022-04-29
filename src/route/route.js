@@ -7,7 +7,7 @@ const blogsController = require("../controller/blogsController");
 const {authentication,authorization} = require('../middleware/authorization');
 
 // create author
-router.post("/createAuthors", authorController.createAuthor)
+router.post("/authors", authorController.createAuthor)
 
 //create post login with jwt token as output
 router.post("/login", authorController.authorLogin)
