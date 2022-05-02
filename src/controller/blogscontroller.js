@@ -244,6 +244,13 @@ const deleteBlogsById = async function (req, res) {
 const deleteBlogsByQuery = async function (req, res) {
     try {
         let data = req.query;
+        
+        if (data.authorId) {
+            if (data.authorId != req.decodedToken.authorId) return res.status(401).send({
+                status: false,
+                msg: "an authorized access"
+            });
+        }
         // add a query variable and add a default key value [ isDeleted: false ]
         let query = {
             isDeleted: false,
