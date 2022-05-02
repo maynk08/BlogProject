@@ -17,7 +17,7 @@ const createBlogs = async (req, res) => {
     try {
         // 👇 get all data from body here 🤯
         const data = req.body;
-        data.authorId = req.decodedToken.authorId
+//         data.authorId = req.decodedToken.authorId
 
         // validate required info...
         if (Object.keys(data).length == 0) {
