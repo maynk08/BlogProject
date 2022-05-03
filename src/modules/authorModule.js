@@ -4,11 +4,13 @@ const mongoose = require('mongoose')
 const authorSchema = new mongoose.Schema({
     fname: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     lname: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     title: {
         type: String,
@@ -19,6 +21,7 @@ const authorSchema = new mongoose.Schema({
         type: String,
         required: true,
         unique: true,
+        trim: true,
         match: [
             /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
             'Please add a valid email address.',
@@ -26,7 +29,8 @@ const authorSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     }
 }, {
     timestamps: true

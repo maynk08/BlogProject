@@ -17,7 +17,7 @@ const createBlogs = async (req, res) => {
     try {
         // 👇 get all data from body here 🤯
         const data = req.body;
-        data.authorId = req.decodedToken.authorId
+        // data.authorId = req.decodedToken.authorId
 
         // validate required info...
         if (Object.keys(data).length == 0) {
@@ -26,11 +26,13 @@ const createBlogs = async (req, res) => {
                 msg: "POST Body data required"
             });
         }
+
         if (!data.authorId) return res.status(400).send({
             status: false,
             msg: "authorId id mandatory"
         })
-        // 👇 need to check author id is valid or not 🔍🔍
+
+        // 👇 need to check author id is valid or not 🔍
         const isValidAuthor = await authorModule
             .findById(data.authorId)
             .catch(err => null);
@@ -68,10 +70,7 @@ const createBlogs = async (req, res) => {
 const getAllBlogs = async (req, res) => {
     try {
         let data = req.query;
-        let query = {
-            isDeleted: false,
-            isPublished: true
-        };
+        let query = {};
 
         if (Object.keys(data).length > 0) {
             if (data.tags) {
@@ -86,23 +85,11 @@ const getAllBlogs = async (req, res) => {
                 };
             }
 
-            query["$or"] = [{
-                    title: data.title
-                },
-                {
-                    authorId: data.authorId
-                },
-                {
-                    tags: data.tags
-                },
-                {
-                    category: data.category
-                },
-                {
-                    subcategory: data.subcategory
-                }
-            ];
+            query = data
         }
+
+        query.isDeleted = false;
+        query.isPublished = true;
 
         const allBlogs = await blogsModule.find(query);
 
@@ -160,20 +147,14 @@ const updateBlogsById = async function (req, res) {
             if (typeof data.tags == "object") {
                 blogData.tags.push(...data.tags);
             } else {
-                return res.status(400).send({
-                    status: false,
-                    msg: "tag value must be an array"
-                });
+                blogData.tags.push(data.tags);
             }
         }
         if (data.subcategory) {
             if (typeof data.subcategory == "object") {
                 blogData.subcategory.push(...data.subcategory);
             } else {
-                return res.status(400).send({
-                    status: false,
-                    msg: "subcategory value must be an array"
-                });
+                blogData.subcategory.push(data.subcategory);
             }
         }
         blogData.publishedAt = Date(); //Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
@@ -214,7 +195,8 @@ const deleteBlogsById = async function (req, res) {
             msg: "User data not found"
         })
         let updated = await blogsModule.findByIdAndUpdate({
-            _id: blogId
+            _id: blogId,
+            isDeleted: false
         }, {
             isDeleted: true,
             deletedAt: Date()
@@ -244,18 +226,15 @@ const deleteBlogsById = async function (req, res) {
 const deleteBlogsByQuery = async function (req, res) {
     try {
         let data = req.query;
-        
+
         if (data.authorId) {
             if (data.authorId != req.decodedToken.authorId) return res.status(401).send({
                 status: false,
                 msg: "Unauthorized access"
             });
         }
-        // add a query variable and add a default key value [ isDeleted: false ]
-        let query = {
-            isDeleted: false,
-            authorId: req.decodedToken.authorId
-        };
+        // add a query variable
+        let query = {};
 
         if (Object.keys(data).length == 0) {
             //-> if data undefined
@@ -278,29 +257,20 @@ const deleteBlogsByQuery = async function (req, res) {
                 };
             }
 
-            // create a query structure in [ query.$or = ... }
-            query["$or"] = [{
-                    title: data.title
-                },
-                {
-                    tags: data.tags
-                },
-                {
-                    category: data.category
-                },
-                {
-                    subcategory: data.subcategory
-                }
-            ];
+            // create a query structure
+            query = data
         }
 
-        // console.log(query)
+        // add default query
+        query.isDeleted = false
+        query.authorId = req.decodedToken.authorId
+
         // check if the query related data exist OR not
         const available = await blogsModule.find(query).count();
         if (available == 0) {
             return res.status(404).send({
                 status: false,
-                msg: "query data not found"
+                msg: "query data not found OR may be you are Unauthorised to delete info"
             });
         }
 
