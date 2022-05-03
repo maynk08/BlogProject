@@ -2,6 +2,13 @@ const jwt = require('jsonwebtoken');
 const authorModule = require('../modules/authorModule');
 
 
+// 👇 email validater
+const validateEmail = (email) => {
+    let filter = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return filter.test(email) ? true : false
+};
+
+
 /*------------------------------------------------------------------------------------------
  ## Author APIs /authors
  -> Create an author - atleast 5 authors
@@ -11,45 +18,74 @@ const authorModule = require('../modules/authorModule');
 
 const createAuthor = async function (req, res) {
     try {
-        const reqAuthor = req.body;
-        if (Object.keys(reqAuthor).length == 0) {
+        const {
+            fname,
+            lname,
+            title,
+            email,
+            password
+        } = req.body;
+        if (Object.keys(req.body).length == 0) {
             return res.status(400).send({
                 status: false,
                 msg: "Body is required"
             })
         }
-        // false cases...
-        if (!reqAuthor.fname) return res.status(400).send({
+        /*----------------------------------------------------------
+        Validate the body data start 
+        ----------------------------------------------------------*/
+        if (!fname || !fname.trim()) return res.status(400).send({
             status: false,
             msg: "First Name must be required!"
         })
 
-        if (!reqAuthor.lname) return res.status(400).send({
+        if (!lname || !lname.trim()) return res.status(400).send({
             status: false,
             msg: "Last Name must be required!"
         })
 
-        if (!reqAuthor.title) return res.status(400).send({
+        if (!title || !title.trim()) return res.status(400).send({
             status: false,
             msg: "Title must be required!"
         })
 
-        if (!reqAuthor.email) return res.status(400).send({
+        if (['Mr', 'Mrs', 'Miss'].indexOf(title.trim()) == -1) return res.status(400).send({
+            status: false,
+            msg: "Title not valid, Please try with Mr Mrs and Miss"
+        })
+
+        if (!email || !email.trim()) return res.status(400).send({
             status: false,
             msg: "Email must be required!"
         })
 
-        if (!reqAuthor.password) return res.status(400).send({
+        if (!validateEmail(email.trim())) return res.status(400).send({
+            status: false,
+            msg: "Please enter a valid email address!"
+        })
+
+        let emailIsExist = await authorModule.findOne({
+            email: email.trim()
+        }).catch(e => null)
+
+        if (emailIsExist) return res.status(400).send({
+            status: false,
+            msg: `${email} is already exists try with another email address`
+        })
+
+        if (!password || !password.trim()) return res.status(400).send({
             status: false,
             msg: "Password must be required!"
         })
 
-
-        const saveData = await authorModule.create(reqAuthor)
-        if (!saveData) return res.status(500).send({
-            status: false,
-            msg: "Can't save something went wrong"
-        })
+        let metaData = {
+            fname,
+            lname,
+            title,
+            email,
+            password
+        }
+        const saveData = await authorModule.create(metaData)
         res.status(201).send({
             status: true,
             data: saveData
@@ -71,15 +107,24 @@ const authorLogin = async function (req, res) {
             msg: "body not present"
         })
 
-        let email = req.body.email
-        let password = req.body.password
+        let {
+            email,
+            password
+        } = req.body
 
-        if (!email) return res.status(400).send({
+
+
+        if (!email || !email.trim()) return res.status(400).send({
             status: false,
             msg: "email not present"
         })
 
-        if (!password) return res.status(400).send({
+        if (!validateEmail(email.trim())) return res.status(400).send({
+            status: false,
+            msg: "Please enter a valid email address!"
+        })
+
+        if (!password || !password.trim()) return res.status(400).send({
             status: false,
             msg: "password not present"
         })

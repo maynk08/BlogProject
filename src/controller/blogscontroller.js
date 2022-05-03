@@ -17,7 +17,6 @@ const createBlogs = async (req, res) => {
     try {
         // 👇 get all data from body here 🤯
         const data = req.body;
-        // data.authorId = req.decodedToken.authorId
 
         // validate required info...
         if (Object.keys(data).length == 0) {
@@ -27,9 +26,31 @@ const createBlogs = async (req, res) => {
             });
         }
 
-        if (!data.authorId) return res.status(400).send({
+        let {
+            title,
+            body,
+            authorId,
+            tags,
+            category,
+            subcategory,
+            isPublished
+        } = data
+
+        // authorId = req.decodedToken.authorId
+
+        // 👇 Validate data
+        if (!title || !title.trim()) return res.status(400).send({
             status: false,
-            msg: "authorId id mandatory"
+            msg: "Title must be required"
+        })
+        if (!body || !body.trim()) return res.status(400).send({
+            status: false,
+            msg: "Body must be required"
+        })
+
+        if (!authorId || !authorId.trim()) return res.status(400).send({
+            status: false,
+            msg: "AuthorId must be required"
         })
 
         // 👇 need to check author id is valid or not 🔍
@@ -44,8 +65,27 @@ const createBlogs = async (req, res) => {
             });
         }
 
+        if (tags && !Array.isArray(tags)) return res.status(400).send({
+            status: false,
+            msg: "Tags must be an array"
+        })
+
+        if (subcategory && !Array.isArray(subcategory)) return res.status(400).send({
+            status: false,
+            msg: "Subcategory must be an array"
+        })
+
         // 👇 Create a blog document from request body
-        const createBlogs = await blogsModule.create(data);
+        const createBlogs = await blogsModule.create({
+            title,
+            body,
+            authorId,
+            tags,
+            category,
+            subcategory,
+            isPublished: isPublished ? isPublished : false,
+            publishedAt: isPublished ? new Date() : null,
+        });
 
         res.status(201).send({
             status: true,
@@ -144,21 +184,28 @@ const updateBlogsById = async function (req, res) {
         if (data.body) blogData.body = data.body;
         if (data.category) blogData.category = data.category;
         if (data.tags) {
-            if (typeof data.tags == "object") {
+            if (Array.isArray(data.tags)) {
                 blogData.tags.push(...data.tags);
             } else {
                 blogData.tags.push(data.tags);
             }
         }
         if (data.subcategory) {
-            if (typeof data.subcategory == "object") {
+            if (Array.isArray(data.subcategory)) {
                 blogData.subcategory.push(...data.subcategory);
             } else {
                 blogData.subcategory.push(data.subcategory);
             }
         }
-        blogData.publishedAt = Date(); //Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
-        blogData.isPublished = true;
+        if (typeof data.isPublished == 'boolean') {
+            if (data.isPublished) {
+                blogData.publishedAt = new Date(); //Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
+                blogData.isPublished = true;
+            } else {
+                blogData.publishedAt = null;
+                blogData.isPublished = false;
+            }
+        }
         blogData.save();
 
         res.status(200).send({
@@ -199,7 +246,7 @@ const deleteBlogsById = async function (req, res) {
             isDeleted: false
         }, {
             isDeleted: true,
-            deletedAt: Date()
+            deletedAt: new Date()
         }, {
             new: true
         });
@@ -278,7 +325,7 @@ const deleteBlogsByQuery = async function (req, res) {
         const deleteData = await blogsModule.updateMany(query, {
             $set: {
                 isDeleted: true,
-                deletedAt: Date()
+                deletedAt: new Date()
             }
         });
         res.status(200).send({

@@ -3,7 +3,6 @@ const blogsModule = require("../modules/blogsModule")
 
 const authentication = (req, res, next) => {
     try {
-
         let token = req.headers["x-api-key"]
         if (!token) return res.status(400).send({
             status: false,
