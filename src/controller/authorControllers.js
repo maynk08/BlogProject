@@ -133,7 +133,6 @@ const authorLogin = async function (req, res) {
                 email: email,
                 password: password
             })
-            .catch(error => null);
 
         if (!findAuthor) return res.status(401).send({
             status: false,
@@ -143,7 +142,7 @@ const authorLogin = async function (req, res) {
         //jwt.sign token creation
         const token = jwt.sign({
             authorId: findAuthor._id.toString()
-        }, 'Group 27');
+        }, 'blog-project');
 
         res.status(200).send({
             status: true,

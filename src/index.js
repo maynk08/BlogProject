@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({
 /*----------------------------------------------------------------------
 🗃️ connect mongo db
 ----------------------------------------------------------------------*/
-mongoose.connect("mongodb+srv://firstDB:zwPu7dwJG0RCXU9f@cluster0.kgij2.mongodb.net/project1-DB?retryWrites=true&w=majority", {
+mongoose.connect("mongodb+srv://functionupassignment:msJISmjxvX4gvZ9W@functionup.nyvlz.mongodb.net/Project01", {
         useNewUrlParser: true
     })
     .then((result) => console.log("MongoDb is connected"))

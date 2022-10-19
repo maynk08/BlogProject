@@ -8,7 +8,7 @@ const authentication = (req, res, next) => {
             status: false,
             msg: "x-api-key is required"
         })
-        const decodedToken = jwt.verify(token, 'Group 27')
+        const decodedToken = jwt.verify(token, 'blog-project')
         if (!decodedToken) return res.status(401).send({
             status: false,
             msg: "invalid token. please enter a valid token"

@@ -15,7 +15,7 @@ const authorModule = require("../modules/authorModule");
 
 const createBlogs = async (req, res) => {
     try {
-        // 👇 get all data from body here 🤯
+        // 👇 get all data from body here 
         const data = req.body;
 
         // validate required info...
@@ -57,13 +57,19 @@ const createBlogs = async (req, res) => {
         const isValidAuthor = await authorModule
             .findById(data.authorId)
             .catch(err => null);
+
         if (!isValidAuthor) {
             // NOT true
             return res.status(401).send({
                 status: false,
-                msg: "⚠️ Invalid AuthorId, please try with a valid AuthorId"
+                msg: "Invalid AuthorId, please try with a valid AuthorId"
             });
         }
+
+        if (category && !Array.isArray(category)) return res.status(400).send({
+            status: false,
+            msg: "Category must be an array"
+        })
 
         if (tags && !Array.isArray(tags)) return res.status(400).send({
             status: false,
@@ -113,6 +119,11 @@ const getAllBlogs = async (req, res) => {
         let query = {};
 
         if (Object.keys(data).length > 0) {
+
+            if(data.authorId){
+                query.authorId = data.authorId
+            }
+
             if (data.tags) {
                 data.tags = {
                     $in: data.tags
@@ -125,12 +136,19 @@ const getAllBlogs = async (req, res) => {
                 };
             }
 
+            if (data.category) {
+                data.category = {
+                    $in: data.category
+                };
+            }
+
             query = data
         }
 
         query.isDeleted = false;
         query.isPublished = true;
 
+        console.log(query)
         const allBlogs = await blogsModule.find(query);
 
         if (allBlogs.length == 0) {
@@ -182,7 +200,13 @@ const updateBlogsById = async function (req, res) {
 
         if (data.title) blogData.title = data.title;
         if (data.body) blogData.body = data.body;
-        if (data.category) blogData.category = data.category;
+        if (data.category) {
+            if (Array.isArray(data.category)) {
+                blogData.category.push(...data.category);
+            } else {
+                blogData.category.push(data.category);
+            }
+        }
         if (data.tags) {
             if (Array.isArray(data.tags)) {
                 blogData.tags.push(...data.tags);
