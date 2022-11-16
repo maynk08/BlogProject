@@ -1,7 +1,7 @@
 {
   "name": "blogging-site-mini-project",
   "version": "1.0.0",
-  "description": "Dolly Show, Amit Kumar Sharma, Dhiraj Patil , Shail kumar Sahoo",
+  "description": "Mayank",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AmitKumarSharma4046/Blogging-Site-Mini-Project.git"
+    "url": ""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/AmitKumarSharma4046/Blogging-Site-Mini-Project/issues"
+    "url": ""
   },
-  "homepage": "https://github.com/AmitKumarSharma4046/Blogging-Site-Mini-Project#readme",
+  "homepage": "",
   "dependencies": {
     "body-parser": "^1.20.0",
     "cors": "^2.8.5",

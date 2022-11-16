@@ -110,7 +110,7 @@ const createBlogs = async (req, res) => {
 
 
 /*------------------------------------------------------------------------------------------
- ➡️ GET METHOD, GET ALL LIST OF BLOGS
+ ➡️ GET METHOD, GET ALL LIST OF BLOGS 
 ------------------------------------------------------------------------------------------ */
 
 const getAllBlogs = async (req, res) => {
@@ -223,7 +223,7 @@ const updateBlogsById = async function (req, res) {
         }
         if (typeof data.isPublished == 'boolean') {
             if (data.isPublished) {
-                blogData.publishedAt = new Date(); //Fri Apr 29 2022 11:14:26 GMT+0530 (India Standard Time)
+                blogData.publishedAt = new Date(); 
                 blogData.isPublished = true;
             } else {
                 blogData.publishedAt = null;

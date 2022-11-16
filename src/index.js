@@ -5,23 +5,30 @@ const mongoose = require('mongoose');
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-    extended: true
-}));
+
 
 /*----------------------------------------------------------------------
 🗃️ connect mongo db
 ----------------------------------------------------------------------*/
-mongoose.connect("mongodb+srv://functionupassignment:msJISmjxvX4gvZ9W@functionup.nyvlz.mongodb.net/Project01", {
-        useNewUrlParser: true
+
+
+mongoose.connect("mongodb+srv://Keshav-cyber:7LizqrsG6tL39fuT@cluster0.ohm0bak.mongodb.net/group38Database?retryWrites=true&w=majority", {
+        useNewUrlParser: true          //allowing user to use any new url cluster string 
     })
     .then((result) => console.log("MongoDb is connected"))
     .catch((err) => console.log(err))
 
 
+
+
+//calling route globally here
 app.use('/', route)
 
 
+
+
+
+//binding and listening the connection on specified port
 app.listen(process.env.PORT || 3000, function () {
     console.log('Express app running on port ' + (process.env.PORT || 3000))
 });
